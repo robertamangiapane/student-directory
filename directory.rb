@@ -14,6 +14,7 @@ def print_menu
   # 1. print the menu and ask the user what to do
   puts "1. Input the students"
   puts "2. Show the students"
+  puts "3. Save the list to students.csv"
   puts "9. Exit"
 end
 
@@ -24,6 +25,8 @@ def process(selection)
       @students = input_students
     when "2"
       show_students
+    when "3"
+      save_students
     when "9"
       exit 
       #this will cause the program to terminate
@@ -84,6 +87,18 @@ def show_students
     print_footer
   end
 end 
+
+def save_students
+  #open the file for writing
+  file = File.open("students.csv", "w")
+  #iterate over the array of students
+  @students.each do |student|
+    student_data = " #{student[:name]}, hobby: #{student[:hobby]}, age: #{student[:age]}, country of birth: #{student[:cob]}, cohort: #{student[:cohort]}"
+    cvs_line = student_data.joint(";")
+    file.puts csv_line
+  end
+  file.close
+end
 
 def print_header
   puts "The students of Villains Academy"
