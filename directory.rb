@@ -15,6 +15,7 @@ def print_menu
   puts "1. Input the students"
   puts "2. Show the students"
   puts "3. Save the list to students.csv"
+  puts "4. Load the list from students.csv"
   puts "9. Exit"
 end
 
@@ -27,6 +28,8 @@ def process(selection)
       show_students
     when "3"
       save_students
+    when "4"
+      load_students
     when "9"
       exit 
       #this will cause the program to terminate
@@ -93,13 +96,21 @@ def save_students
   file = File.open("students.csv", "w")
   #iterate over the array of students
   @students.each do |student|
-    student_data = " #{student[:name]}, hobby: #{student[:hobby]}, age: #{student[:age]}, country of birth: #{student[:cob]}, cohort: #{student[:cohort]}"
-    cvs_line = student_data.joint(";")
-    file.puts csv_line
+    student_data = "#{student[:name]}, #{student[:hobby]}, #{student[:age]}, #{student[:cob]}, #{student[:cohort]}"
+    file.puts student_data
   end
   file.close
 end
 
+def load_students
+  file = File.open("students.csv", "r")
+  file.readlines.each do |line|
+    name, hobby, age, cob, cohort = line.chomp.split(", ")
+      @students << {name: name, hobby: hobby, age: age, cob: cob, cohort: cohort}
+    end
+    file.close
+  end
+  
 def print_header
   puts "The students of Villains Academy"
   puts  "-------------"
@@ -107,17 +118,16 @@ end
 
 def print_students_list
   @cohorts.each do |cohort|
-    month = cohort
     group = ""
     @students.each do |student|
-      if student[:cohort] == month
-        group =  "#{group} #{student[:name]}, hobby: #{student[:hobby]}, age: #{student[:age]}, country of birth: #{student[:cob]};"
+      if student[:cohort] == cohort
+        group +=  "#{student[:name]}, #{student[:hobby]}, #{student[:age]}, #{student[:cob]}; "
       end
     end
     if group == ""
       group = "No students for this cohort"
     end
-      puts "#{month}: #{group}"
+      puts "#{cohort}: #{group}"
   end
 end
 
