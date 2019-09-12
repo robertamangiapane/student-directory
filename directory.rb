@@ -5,13 +5,11 @@ require 'date'
 def interactive_menu
   loop do
     print_menu
-    # 2. read the input and save it into a variable
-    process(gets.chomp)
+    process(STDIN.gets.chomp)
   end
 end
 
 def print_menu
-  # 1. print the menu and ask the user what to do
   puts "1. Input the students"
   puts "2. Show the students"
   puts "3. Save the list to students.csv"
@@ -20,10 +18,9 @@ def print_menu
 end
 
 def process(selection)
-  # 3. do what the user has asked
   case selection
     when "1"
-      @students = input_students
+      input_students
     when "2"
       show_students
     when "3"
@@ -41,29 +38,29 @@ end
 def input_students
   puts "Please enter the names of the students, hobbies, age, country of birth and cohort"
   puts "To finish, just hit return twice"
-  name = gets.chomp
+  name = STDIN.gets.chomp
   while !name.empty? do
     puts "Enter hobby: "
-    hobby = gets.chomp
+    hobby = STDIN.gets.chomp
     if hobby == ""
       hobby = "N/A"
     end
     puts "Enter age: "
-    age = gets.chomp
+    age = STDIN.gets.chomp
     if !age.is_a? Integer
       age = "N/A"
     end
     puts "Enter country of birth: "
-    cob = gets.chomp
+    cob = STDIN.gets.chomp
     if cob == ""
       cob = "N/A"
     end
     puts "Enter cohort: "
-    cohort = gets.chomp.capitalize
+    cohort = STDIN.gets.chomp.capitalize
     while !@cohorts.include? cohort
       loop do
         puts "Enter cohort: "
-        cohort = gets.chomp.capitalize
+        cohort = STDIN.gets.chomp.capitalize
         if @cohorts.include? cohort
           break
         end
@@ -76,9 +73,8 @@ def input_students
       puts "Now we have #{@students.count} students"
     end
     puts "Enter students' name"
-    name = gets.chomp
+    name = STDIN.gets.chomp
   end
-  @students
 end
 
 def show_students
@@ -92,24 +88,35 @@ def show_students
 end 
 
 def save_students
-  #open the file for writing
   file = File.open("students.csv", "w")
-  #iterate over the array of students
   @students.each do |student|
-    student_data = "#{student[:name]}, #{student[:hobby]}, #{student[:age]}, #{student[:cob]}, #{student[:cohort]}"
-    file.puts student_data
+    student_data = [student[:name], student[:hobby], student[:age], student[:cob], student[:cohort]]
+    csv_line = student_data.join(",")
+    file.puts csv_line
   end
   file.close
 end
 
-def load_students
-  file = File.open("students.csv", "r")
-  file.readlines.each do |line|
-    name, hobby, age, cob, cohort = line.chomp.split(", ")
-      @students << {name: name, hobby: hobby, age: age, cob: cob, cohort: cohort}
-    end
-    file.close
+def try_load_students
+  filename = ARGV.first
+  return if filename.nil?
+  if File.exists?(filename)
+    load_students(filename)
+      puts "Loaded #{@students.count} from #{filename}"
+  else
+    puts "Sorry, #{filename} doesn't exist."
+    exit
   end
+end
+
+def load_students(filename = "students.csv")
+  file = File.open(filename, "r")
+  file.readlines.each do |line|
+    name, hobby, age, cob, cohort = line.chomp.split(",")
+      @students << {name: name, hobby: hobby, age: age, cob: cob, cohort: cohort}
+  end
+  file.close
+end
   
 def print_header
   puts "The students of Villains Academy"
@@ -121,7 +128,7 @@ def print_students_list
     group = ""
     @students.each do |student|
       if student[:cohort] == cohort
-        group +=  "#{student[:name]}, #{student[:hobby]}, #{student[:age]}, #{student[:cob]}; "
+        group += "#{student[:name]}, #{student[:hobby]}, #{student[:age]}, #{student[:cob]}; "
       end
     end
     if group == ""
@@ -135,4 +142,5 @@ def print_footer
   puts "Overall, we have #{@students.count} great students"
 end
 
+try_load_students
 interactive_menu
