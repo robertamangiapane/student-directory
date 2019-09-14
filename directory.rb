@@ -5,17 +5,18 @@ require 'csv'
 
 def interactive_menu
   loop do
-    print_menu
+    puts print_menu
     process(STDIN.gets.chomp)
   end
 end
 
 def print_menu
-  puts "1. Input the students"
-  puts "2. Show the students"
-  puts "3. Save the list to a file"
-  puts "4. Load the list from a file"
-  puts "9. Exit"
+  menu = "1. Input the students
+2. Show the students
+3. Save the list to a file
+4. Load the list from a file
+9. Exit"
+  menu
 end
 
 def process(selection)
@@ -105,14 +106,20 @@ def save_students
   end
 end
 
-def try_load_students
-  filename = "students.csv"
-  return if filename.nil?
-  if File.exist?(filename)
-    load_students(filename)
-      puts "Loaded #{@students.count} from #{filename}"
-  else
-    puts "Sorry, tried to load #{filename} but it doesn't exist."
+def try_load_students(filename = ARGV.first)
+  if filename.nil?
+    filename = "students.csv"
+    if File.exist?(filename)
+      load_students(filename)
+    else
+      puts "Sorry, tried to load #{filename} but it doesn't exist."
+    end
+  else 
+    if File.exist?(filename)
+      load_students(filename)
+    else
+      puts "Sorry, tried to load #{filename} but it doesn't exist."
+    end
   end
 end
 
@@ -153,7 +160,11 @@ def print_students_list
 end
 
 def print_footer
-  puts "Overall, we have #{@students.count} great students"
+  if  @students.count == 1
+    puts "Overall, we have #{@students.count} great student"
+  else
+    puts "Overall, we have #{@students.count} great students"
+  end
 end
 
 try_load_students
